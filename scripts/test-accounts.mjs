@@ -16,7 +16,7 @@ assert.equal((await request('/login',{method:'POST',body:{username:'旅人A_'+su
 assert.equal((await request('/save')).status,401);
 assert.equal((await request('/save',{cookie:first.cookie,method:'PUT',csrf:false,body:{}})).status,403);
 assert.equal((await request('/session',{cookie:first.cookie,source:'https://other.example'})).status,403);
-const save={version:1,done:[],weak:[],attempts:{},cursor:{letter:5,step:2,stage:'challenge'},sound:false,reduceMotion:false};
+const save={version:1,done:['hello'],weak:[],attempts:{hello:1},written:['hello'],moments:{first:0},drafts:{hello:{answer:'',code:'print(\"你好，蒙德！\")',revision:2}},cursor:{letter:5,step:2,stage:'challenge'},sound:false,reduceMotion:false};
 const stored=await request('/save',{method:'PUT',cookie:first.cookie,body:{save,revision:0}});assert.equal(stored.status,200);assert.equal(stored.data.revision,1);
 assert.deepEqual((await request('/save',{cookie:first.cookie})).data.save,save);
 assert.equal((await request('/save',{cookie:second.cookie})).data.save,null);

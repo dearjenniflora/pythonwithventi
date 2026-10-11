@@ -11,6 +11,7 @@ self.onmessage = async ({data}) => {
   try{
    await python.runPythonAsync(data.code,{globals:scope});
    scope.set('__output',output);
+   scope.set('__source',data.code);
    if(data.test) await python.runPythonAsync(data.test,{globals:scope});
    self.postMessage({type:'result',ok:true,output});
   }finally{scope.destroy();}

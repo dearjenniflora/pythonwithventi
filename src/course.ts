@@ -1,4 +1,5 @@
-export type Challenge = {id:string;topic:string;kind:'choice'|'output'|'code';title:string;explain:string;code:string;options?:string[];answer?:string;hint:string;visual:string[];success:string;test?:string;source:string};
+import {lessons} from './learning';
+export type Challenge = {id:string;topic:string;kind:'choice'|'output'|'code';title:string;explain:string;code:string;options?:string[];answer?:string;hint:string;visual:string[];success:string;test?:string;source:string;revision?:number};
 export type Letter={id:string;title:string;subtitle:string;place:string;description:string;dialogue:string[];challenges:Challenge[]};
 const c=(id:string,topic:string,kind:Challenge['kind'],title:string,explain:string,code:string,answer:string,options:string[],hint:string,visual:string[],success:string,source:string,test?:string):Challenge=>({id,topic,kind,title,explain,code,answer,options:options.length?options:undefined,hint,visual,success,source,test});
 export const letters:Letter[]=[
@@ -33,6 +34,38 @@ c('input','input 返回字符串','choice','旅人递来了数字 4','input(prom
 c('final','综合修改与测试','code','写下属于你的风之书简','完成函数：把传来的数字文字转换为整数，再加上 1。函数应该返回数字，而不仅仅是打印。下方的断言会帮你检查。','def tomorrow(count):\n    # count 来自 input，是字符串\n    return count + 1\n\nprint(tomorrow("4"))','',[],'在加 1 前，用 int(count) 把文字变成整数。',['"4" → int → 4','4 + 1 → 5','return → 交回数字'],'第一章的信，已经寄出了。你学会的不只是几个词，而是让想法被计算机理解的方法。下一阵风来时，我们再出发。','L2 · p43,45–48','assert tomorrow("4") == 5\nassert tomorrow("0") == 1\nassert tomorrow("12") == 13')
 ]}
 ];
+// Keep stable IDs for existing saves. New writing tasks replace passive answers.
+const writing:Record<string,Partial<Challenge>>={
+ hello:{kind:'code',code:'',revision:2,test:'assert __output.strip() == "你好，蒙德！", "请输出一行：你好，蒙德！"'},
+ naming:{kind:'code',code:'',revision:2,test:'assert wind_poem == "风与诗", "请创建 wind_poem，值为字符串 风与诗"'},
+ inventory:{kind:'code',code:'',revision:2,test:'assert bag == ["苹果", "羽毛", "乐谱"], "bag 应按顺序装入 苹果、羽毛、乐谱"'},
+ separator:{kind:'code',code:'',revision:2,test:'import ast\n_tree = ast.parse(__source)\nassert any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "print" and len(n.args) >= 2 and any(k.arg == "sep" for k in n.keywords) for n in ast.walk(_tree)), "请给 print 传入多个内容，并设置 sep 参数"\nassert __output.strip() == "风·诗", "请输出：风·诗"'},
+ return:{kind:'code',code:'',revision:2,test:'assert song() == "风", "song() 应 return 字符串 风，而不只是 print"'},
+ casting:{kind:'code',code:'',revision:2,test:'import ast\n_tree = ast.parse(__source)\nassert any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "int" for n in ast.walk(_tree)), "请用 int 将数字字符串转成整数"\nassert __output.strip() == "5", "转换后加 2，打印结果 5"'},
+ final:{kind:'code',code:'',revision:2,test:'assert tomorrow("4") == 5, "输入字符串 4，应返回整数 5"\nassert tomorrow("0") == 1, "输入字符串 0，应返回整数 1"\nassert tomorrow("12") == 13, "输入字符串 12，应返回整数 13"\nassert __output.strip() == "5", "最后打印 tomorrow 的调用结果"'}
+};
+const openings=[
+ ['你来啦。树荫里还空着一个位置，刚好能听清琴声。','今天不用赶路。先和我一起，弄懂一件小事。'],
+ ['那本诗集我带来了。扉页还空着，想等你亲手落笔。','先学会给东西命名吧。我们的故事，也从一个名字开始。'],
+ ['出发前，把行囊打开让我看看？苹果、乐谱，还有一点点风。','今天只认一样东西。装得太满，走起来反而不轻松。'],
+ ['湖边的风很轻。我留了半句诗，想听你接下去。','先看懂这一小处停顿，再把你的诗写出来。'],
+ ['你走过来的时候，我刚好在试一段新旋律。嗯，真的只是刚好。','有些旋律想唱很多遍。今天，我们让代码也学会这件事。'],
+ ['摘星崖的风，和第一天很像。不过现在，我认得你的脚步声了。','最后一封信，换你亲手写。我就在旁边。']
+];
+letters.forEach((letter,i)=>{letter.dialogue=openings[i];});
+const writingHints:Record<string,string>={
+ hello:'写 print(...)，把要输出的文字放在配对的引号里。输出中不会显示这些引号。',
+ naming:'用 = 把字符串绑定给 wind_poem。文字要加引号；这里不用 print。',
+ inventory:'写 bag = [...]，三个带引号的物品之间用逗号分开，注意顺序。',
+ separator:'给 print 传入两个字符串，再用 sep 参数指定中间的 ·。不要把整个结果写死成一个字符串。',
+ return:'用 def 定义无参数的 song()，冒号后换行并缩进；用 return 交回字符串，不是 print。',
+ casting:'先用 int 处理带引号的数字 3，再加 2，把计算结果交给 print。',
+ final:'def tomorrow(count): 后换行缩进；先 int(count)，再加 1，用 return 交回结果。最后另起一行打印调用结果。'
+};
+const focusedTopics:Record<string,string>={language:'解释器',hello:'print 输出',comments:'注释',objects:'共享引用与重新绑定',types:'数字与字符串',inventory:'列表',strings:'换行符', 'fix-poem':'引号配对',indent:'带参数的函数',return:'返回值','doc-test':'assert 检查',casting:'int 转换',final:'独立写函数'};
+for(const letter of letters)for(const challenge of letter.challenges){if(focusedTopics[challenge.id])challenge.topic=focusedTopics[challenge.id];Object.assign(challenge,writing[challenge.id]||{});if(writingHints[challenge.id])challenge.hint=writingHints[challenge.id];challenge.success=lessons[challenge.id].proof;}
+letters[4].challenges[2].code='def double(n):\n    return n * 2\n\nassert double(3) == 6';
+
 export const curriculum=[
 {level:'L0–L1',title:'启程之前',icon:'✧',status:'待补充课件',topics:['尚未收到 L0、L1 课件，不推测课程内容。']},
 {level:'L2',title:'风的初次来信',icon:'⌁',status:'可游玩 · 6 封书简',topics:letters.map(l=>l.title)},
