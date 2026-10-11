@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.sites-local/
+*.local
+*.tsbuildinfo
+course-sources/
+
+pythonwithventi-cloudflare.zip
+deployment-history/
+DEPLOYMENT.md
