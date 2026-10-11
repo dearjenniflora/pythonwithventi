@@ -1,3 +1,4 @@
+import {extraLessons,extraMoments} from './chapters';
 export type TeachingStep={code:string;result:string;why:string};
 export type Lesson={idea:string;venti:string;steps:TeachingStep[];remember:string;task:string;proof:string;after:string};
 const step=(code:string,result:string,why:string):TeachingStep=>({code,result,why});
@@ -30,3 +31,6 @@ export const moments:Moment[]=[
  {line:'「这首旋律还没取名字。我想，下次你来时，再唱完整的一遍。」',choices:[{text:'我会来听的。',reply:'「那我们说好了。」他的指尖停在琴弦上，像认真收好一句承诺。'},{text:'为什么要等我？',reply:'「因为有一段，想唱给你。」这次，他没有用笑声带过去。'}],memory:'蒙德城的一首未完成的歌，等着下一次相见。'},
  {line:'「今天的信寄完以后，你还会来吗？这一次……不是为了学下一行代码。」',choices:[{text:'会，我也想见你。',reply:'「那就好。」他轻轻牵住你衣袖的一角，「下一阵风来时，我在这里等你。」'},{text:'那你要记得给我留位置。',reply:'「一直都留着呢。」他望向你，声音比风还轻，「以后也一样。」'}],memory:'摘星崖上，下一次见面有了与课程无关的约定。'}
 ];
+
+Object.assign(lessons,extraLessons);
+moments.push(...extraMoments);

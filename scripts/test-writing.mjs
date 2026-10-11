@@ -14,6 +14,6 @@ const solutions={
  final:['def tomorrow(count):\n    return int(count) + 1\n\nprint(tomorrow("4"))','def tomorrow(count):\n    return 5\n\nprint(tomorrow("4"))']
 };
 const runner=`import json,sys,io,contextlib\npayload=json.load(sys.stdin)\nscope={}\nstream=io.StringIO()\ntry:\n with contextlib.redirect_stdout(stream):\n  exec(payload['code'],scope)\n scope['__output']=stream.getvalue()\n scope['__source']=payload['code']\n exec(payload['test'],scope)\n print('PASS')\nexcept Exception as e:\n print(type(e).__name__)\n`;
-const code=letters.flatMap(l=>l.challenges).filter(c=>c.kind==='code');assert.equal(code.length,9);assert.equal(code.filter(c=>c.code==='').length,7);
+const code=letters.filter(l=>l.chapter==='L2').flatMap(l=>l.challenges).filter(c=>c.kind==='code');assert.equal(code.length,9);assert.equal(code.filter(c=>c.code==='').length,7);
 for(const c of code){assert.ok(solutions[c.id],c.id);for(const [index,source] of solutions[c.id].entries()){const result=spawnSync('python3',['-c',runner],{input:JSON.stringify({code:source,test:c.test}),encoding:'utf8'});assert.equal(result.status,0,result.stderr);assert.equal(result.stdout.trim()==='PASS',index===0,`${c.id}: ${result.stdout}`);}}
 console.log('PASS: 9 writing exercises accept working code and reject syntax errors, incorrect types, hardcoded examples, print/return confusion, and shortcuts that skip the taught operation. Seven start from a blank editor.');

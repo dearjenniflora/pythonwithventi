@@ -1,6 +1,7 @@
 import {lessons} from './learning';
+import {extraLetters} from './chapters';
 export type Challenge = {id:string;topic:string;kind:'choice'|'output'|'code';title:string;explain:string;code:string;options?:string[];answer?:string;hint:string;visual:string[];success:string;test?:string;source:string;revision?:number};
-export type Letter={id:string;title:string;subtitle:string;place:string;description:string;dialogue:string[];challenges:Challenge[]};
+export type Letter={chapter?:'L2'|'L3'|'L4'|'L5';id:string;title:string;subtitle:string;place:string;description:string;dialogue:string[];challenges:Challenge[]};
 const c=(id:string,topic:string,kind:Challenge['kind'],title:string,explain:string,code:string,answer:string,options:string[],hint:string,visual:string[],success:string,source:string,test?:string):Challenge=>({id,topic,kind,title,explain,code,answer,options:options.length?options:undefined,hint,visual,success,source,test});
 export const letters:Letter[]=[
 {id:'first',title:'让风听见你',subtitle:'第一封 · 初遇 Python',place:'低语森林',description:'从第一句问候开始，认识代码的语言。',dialogue:['嘘——听见了吗？蒲公英带来了一封没有署名的信。','它说，想让风听懂你的话，只需要学会一种新的语言。嗯……Python，名字还挺有节奏的。','不必急着记住所有规则。先和我一起，让这片森林听见你的第一句问候吧。'],challenges:[
@@ -66,10 +67,15 @@ const focusedTopics:Record<string,string>={language:'解释器',hello:'print 输
 for(const letter of letters)for(const challenge of letter.challenges){if(focusedTopics[challenge.id])challenge.topic=focusedTopics[challenge.id];Object.assign(challenge,writing[challenge.id]||{});if(writingHints[challenge.id])challenge.hint=writingHints[challenge.id];challenge.success=lessons[challenge.id].proof;}
 letters[4].challenges[2].code='def double(n):\n    return n * 2\n\nassert double(3) == 6';
 
+letters.forEach(l=>{l.chapter='L2';});
+letters.push(...extraLetters);
+export const chapters=[
+ {level:'L2',title:'风的初次来信',subtitle:'Python 基础',icon:'⌁'},
+ {level:'L3',title:'风向的选择',subtitle:'运算符与条件',icon:'◇'},
+ {level:'L4',title:'不息的风之歌',subtitle:'循环与控制',icon:'↻'},
+ {level:'L5',title:'诗句的秘密',subtitle:'字符串',icon:'❀'}
+] as const;
 export const curriculum=[
-{level:'L0–L1',title:'启程之前',icon:'✧',status:'待补充课件',topics:['尚未收到 L0、L1 课件，不推测课程内容。']},
-{level:'L2',title:'风的初次来信',icon:'⌁',status:'可游玩 · 6 封书简',topics:letters.map(l=>l.title)},
-{level:'L3',title:'风向的选择',icon:'◇',status:'后续章节',topics:['算术运算：+ − * / // % **、除零与浮点数','关系运算与链式比较','逻辑运算、真值、短路与优先级','赋值与复合赋值','身份与成员运算','if / else / elif 与嵌套条件','奇偶、正负、取最值与综合练习','位运算：课件总结列出，待补充具体教学材料']},
-{level:'L4',title:'不息的风之歌',icon:'↻',status:'后续章节',topics:['for 与序列遍历','range(start, stop, step) 与 len','计数、累加与阶乘练习','while 与终止条件、无限循环','break / continue','嵌套循环与图案练习','嵌套中的 break / continue','pass 与注释的区别']},
-{level:'L5',title:'诗句的秘密',icon:'❀',status:'后续章节',topics:['Unicode、ASCII、UTF-8 与转义','字符串创建、原始字符串、不可变性','== 与 is','正负索引与切片','拼接、重复、遍历与成员判断','重叠子串计数','len / str / lower / upper / replace / join','split / strip / find','元音计数与合法变量名综合练习']}
+ {level:'L0–L1',title:'启程之前',icon:'✧',status:'待补充课件',topics:['尚未收到 L0、L1 课件，不推测课程内容。']},
+ ...chapters.map(ch=>({...ch,status:'已开放',topics:letters.filter(l=>l.chapter===ch.level).map(l=>l.title)}))
 ];

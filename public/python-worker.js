@@ -1,4 +1,5 @@
 import {loadPyodide} from "/python/pyodide.mjs";
+import {PYTHON_CHECKS} from "/python-checks.js";
 let python;
 self.onmessage = async ({data}) => {
  try {
@@ -12,7 +13,7 @@ self.onmessage = async ({data}) => {
    await python.runPythonAsync(data.code,{globals:scope});
    scope.set('__output',output);
    scope.set('__source',data.code);
-   if(data.test) await python.runPythonAsync(data.test,{globals:scope});
+   if(data.test){await python.runPythonAsync(PYTHON_CHECKS,{globals:scope});await python.runPythonAsync(data.test,{globals:scope});}
    self.postMessage({type:'result',ok:true,output});
   }finally{scope.destroy();}
  }catch(e){const full=String(e);const pos=full.lastIndexOf('  File "<exec>"');const result=pos>=0?full.slice(pos):full.split('\n').slice(-4).join('\n');self.postMessage({type:'result',ok:false,output:result});}
