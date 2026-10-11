@@ -52,3 +52,9 @@ L3–L5 保留根据提供课件建立的知识目录；当前不提供这些章
 完整源码、素材和 Python 运行依赖均保留在本地项目文件夹。`.github/workflows/pages.yml` 在 main 分支推送后运行构建并部署 dist。仓库 Settings → Pages 的构建来源需选择 GitHub Actions，自定义域名设为 `pythonwithventi.dearjenniflora.com`；Cloudflare 添加 CNAME，名称 `pythonwithventi`，目标 `dearjenniflora.github.io`（仅 DNS）。`public/CNAME` 随构建保存域名配置。
 
 切换域名后，浏览器存档不会自动迁移；可在旧地址导出 JSON，再到新地址导入。
+
+## 自由探索与旅人账号
+
+所有已制作的 L2 书简与 18 个挑战均可直接进入，地图卡片下方可自由选题。顶部左侧的统一返回按钮可返回上一页或关闭弹窗。L3–L5 仍是待制作的课程目录，不会因为通关而解锁。
+
+登录入口在顶部。注册后，每个账号有独立的本机进度，可以选择复制游客存档，并在账号页手动寄出 / 取回云端存档。账号服务使用自己 Cloudflare 账户内的 Worker 与 D1，见 [server/README.md](server/README.md)。

@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+const base='http://127.0.0.1:8787',origin='http://127.0.0.1:5173';
+const suffix=randomBytes(4).toString('hex');
+const password=randomBytes(18).toString('base64url');
+async function request(path,{method='GET',body,cookie='',source=origin,csrf=true}={}){
+ const headers={'Content-Type':'application/json',Origin:source,Cookie:cookie,'CF-Connecting-IP':`local-test-${suffix}`};if(csrf)headers['X-Venti-Request']='1';
+ const response=await fetch(base+path,{method,headers,body:body?JSON.stringify(body):undefined});
+ const data=await response.json();return {status:response.status,data,cookie:response.headers.get('set-cookie')?.split(';')[0],headers:response.headers};
+}
+const first=await request('/register',{method:'POST',body:{username:'旅人A_'+suffix,password}});
+assert.equal(first.status,201,JSON.stringify(first.data));assert.ok(first.cookie);assert.ok(first.headers.get('set-cookie').includes('HttpOnly'));assert.ok(!JSON.stringify(first.data).includes(password));
+const second=await request('/register',{method:'POST',body:{username:'旅人B_'+suffix,password}});assert.equal(second.status,201);
+assert.equal((await request('/register',{method:'POST',body:{username:'旅人a_'+suffix,password}})).status,409);
+assert.equal((await request('/login',{method:'POST',body:{username:'旅人A_'+suffix,password:'wrong-password-long-enough'}})).status,401);
+assert.equal((await request('/save')).status,401);
+assert.equal((await request('/save',{cookie:first.cookie,method:'PUT',csrf:false,body:{}})).status,403);
+assert.equal((await request('/session',{cookie:first.cookie,source:'https://other.example'})).status,403);
+const save={version:1,done:[],weak:[],attempts:{},cursor:{letter:5,step:2,stage:'challenge'},sound:false,reduceMotion:false};
+const stored=await request('/save',{method:'PUT',cookie:first.cookie,body:{save,revision:0}});assert.equal(stored.status,200);assert.equal(stored.data.revision,1);
+assert.deepEqual((await request('/save',{cookie:first.cookie})).data.save,save);
+assert.equal((await request('/save',{cookie:second.cookie})).data.save,null);
+assert.equal((await request('/save',{method:'PUT',cookie:first.cookie,body:{save,revision:0}})).status,409);
+assert.equal((await request('/save',{method:'PUT',cookie:first.cookie,body:{save:{...save,done:['invented-id']},revision:1}})).status,400);
+assert.equal((await request('/logout',{method:'POST',cookie:first.cookie})).status,200);
+assert.equal((await request('/session',{cookie:first.cookie})).data.user,null);
+assert.equal((await request('/save',{cookie:first.cookie})).status,401);
+const login=await request('/login',{method:'POST',body:{username:'旅人A_'+suffix,password}});assert.equal(login.status,200);assert.equal(login.data.user.id,first.data.user.id);
+assert.deepEqual((await request('/save',{cookie:login.cookie})).data.save,save);
+await request('/logout',{method:'POST',cookie:login.cookie});await request('/logout',{method:'POST',cookie:second.cookie});
+console.log('PASS: real registration/login, case-insensitive uniqueness, wrong passwords, account isolation, persisted saves, revision conflicts, invalid saves, CSRF/CORS protection, logout revocation.');

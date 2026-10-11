@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "pythonwithventi-auth",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "b92e01911b06afcf2ab8bcb26afee9b4",
+  "workers_dev": false,
+  "routes": [{"pattern":"api-pythonwithventi.dearjenniflora.com","custom_domain":true}],
+  "vars": {"APP_ORIGIN":"https://pythonwithventi.dearjenniflora.com"},
+  "d1_databases": [{"binding":"DB","database_name":"pythonwithventi-accounts","database_id":"54533327-7503-44d0-9797-777bb989b218","migrations_dir":"migrations"}],
+  "triggers": {"crons":["17 3 * * *"]}
+}

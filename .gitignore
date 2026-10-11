@@ -8,3 +8,8 @@ course-sources/
 pythonwithventi-cloudflare.zip
 deployment-history/
 DEPLOYMENT.md
+personal-home/
+.wrangler/
+.dev.vars*
+.env*
+!*.example
